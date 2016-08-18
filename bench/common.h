@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <mqueue.h>
+#include <pthread.h>
 #include <sys/mman.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -49,6 +50,26 @@ struct shm_msg {
 	size_t len;
 	char msg[SHM_CLIENT_BUF_IDX - 1024];
 };
+
+/* Interprocess Variables by shm */
+struct shm_mutex_cond {
+	pthread_mutex_t mutex;
+	pthread_mutexattr_t mutex_attr;
+	pthread_cond_t cond;
+	pthread_condattr_t cond_attr;
+};
+
+#define shm_send_signal(smc) do{\
+	pthread_mutex_lock(&smc->mutex);\
+	pthread_cond_signal(&smc->cond);\
+	pthread_mutex_unlock(&smc->mutex);\
+}while(0)
+
+#define shm_wait_signal(smc) do{\
+	pthread_mutex_lock(&smc->mutex);\
+	pthread_cond_wait(&smc->cond, &smc->mutex);\
+	pthread_mutex_unlock(&smc->mutex);\
+}while(0)
 
 /* socket */
 #define SOCKET_SERVER_NAME "test_socket_server"

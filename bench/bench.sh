@@ -20,7 +20,8 @@ out_fname="bench.csv"
 benchs[0]="fifo"
 benchs[1]="mqueue"
 benchs[2]="shm"
-benchs[3]="socket"
+benchs[3]="shm_with_wait"
+benchs[4]="socket"
 
 # build
 make
@@ -29,7 +30,7 @@ make
 echo "ipc_type,msg_size,repeat_count,time" > ${out_fname}
 
 # do all benchs
-for idx in 0 1 2 3
+for idx in 0 1 2 3 4
 do
 	echo -n ${benchs[$idx]} >> ${out_fname}
 	echo -n "," >> ${out_fname}
